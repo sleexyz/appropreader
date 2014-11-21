@@ -1,0 +1,21 @@
+{
+  "name": "sean.lee.mx",
+  "version": "0.0.0",
+  "authors": [
+    "Sean Lee <freshdried@gmail.com>"
+  ],
+  "description": "my stuff",
+  "license": "MIT",
+  "homepage": "sean.lee.mx",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.4.6",
+    "jquery": "~2.1.1"
+  }
+}

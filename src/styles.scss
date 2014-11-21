@@ -1,0 +1,47 @@
+@charset 'UTF-8';
+
+@import 'foundation_settings';
+@import './bower_components/foundation/scss/normalize.scss';
+@import './bower_components/foundation/scss/foundation.scss';
+@import 'reset.scss';
+
+@mixin offset($chars_in_em) {
+	margin-left: (0.6 * $chars_in_em);
+}
+
+$background: #000000;
+$foreground: #ffffff;
+$monospace-stack: Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New", Courier, monospace;
+
+.tab { @include offset(4em) }
+
+html {
+	height: 100%;
+}
+body {
+	margin: 0% 10% 0% 10%;
+	font-family: $monospace-stack;
+	font-size: 12px;
+	font-size: 2.0vmin;
+	line-height: 1.5em;
+	height: auto;
+}
+
+h1 {
+	margin-top: 1em;
+	margin-bottom: 2em;
+}
+
+a {
+	color: #999;
+	text-decoration: none;
+}
+
+.big {
+	font-size: 5.0vmin;
+}
+.project {
+	background-color: #ddd;
+	padding: 0.6em;
+	margin-bottom: 1em;
+}
