@@ -16,5 +16,7 @@ appropreader seeks to explore a space of textual transformations with a differen
 why would we want to make something more transformable?
 
 ##todo:
-- finish readme
+- check out atom/ace
+- get content-editable react sync to work
+
 

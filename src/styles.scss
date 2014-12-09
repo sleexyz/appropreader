@@ -1,8 +1,5 @@
 @charset 'UTF-8';
 
-@import 'foundation_settings';
-@import './bower_components/foundation/scss/normalize.scss';
-@import './bower_components/foundation/scss/foundation.scss';
 @import 'reset.scss';
 
 @mixin offset($chars_in_em) {
@@ -11,20 +8,24 @@
 
 $background: #000000;
 $foreground: #ffffff;
+
 $monospace-stack: Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New", Courier, monospace;
+$fontsize: 2.0vmin;
+
 
 .tab { @include offset(4em) }
 
 html {
 	height: 100%;
 }
+
 body {
 	margin: 0% 10% 0% 10%;
 	font-family: $monospace-stack;
 	font-size: 12px;
-	font-size: 2.0vmin;
+	font-size: $fontsize;
 	line-height: 1.5em;
-	height: auto;
+	height: 80%;
 }
 
 h1 {
@@ -37,11 +38,39 @@ a {
 	text-decoration: none;
 }
 
-.big {
-	font-size: 5.0vmin;
+.editable {
+    outline: 0px solid transparent;
+    resize: none;
+    border: none;
+    box-sizing: border-box;
+
+	font-size: $fontsize;
+	font-family: $monospace-stack;
+	line-height: 1.5em;
+
+    overflow-x: hidden;
+    overflow-y: hidden;
+    width: 100%;
+    height: 100%;
+
+
+    margin: 0;
+    padding: 0;
+    padding-left: 0.6* 8em;;
+
+    background: #eeeeee;
 }
-.project {
-	background-color: #ddd;
-	padding: 0.6em;
-	margin-bottom: 1em;
+
+.noneditable {
+    white-space: pre-wrap;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    margin: 0;
+    padding: 0;
+    padding-left: 0.6* 8em;;
+}
+
+#content {
+    height: 100%;
+    width: 50%;
 }
