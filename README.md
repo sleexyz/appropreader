@@ -16,7 +16,12 @@ appropreader seeks to explore a space of textual transformations with a differen
 why would we want to make something more transformable?
 
 ##todo:
-- check out atom/ace
-- get content-editable react sync to work
+- refactor `author` as `voice`
+- fix bug, that really long words break the Textarea invariants
+- differentiate between different voices (by color? by indent?)
+- implement switching between diffrent voices
+- On switch, implement read-only mode (textarea -> p) for everyone but the current voice
+- Implement hiding voices.
+- Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
 
 
