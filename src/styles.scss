@@ -21,13 +21,10 @@ html {
 }
 
 document, body {
-    margin: 0% 10% 0% 10%;
-    margin: 0 0.6em 0 0.6em;
     font-family: $monospace-stack;
     font-size: 12px;
     font-size: $fontsize;
     line-height: $lh;
-    height: 80%;
 }
 
 h1 {
@@ -38,6 +35,35 @@ h1 {
 a {
     color: #999;
     text-decoration: none;
+}
+@mixin pane() {
+    margin: 0 0.6em 0 0.6em;
+    width: calc(100% - 1.2em);
+}
+header {
+    @include pane;
+    position: fixed;
+    top: $lh;
+    left: 0;
+    height: $lh;
+}
+
+.VoiceChooser {
+    position: absolute;
+    right: 0.6em;
+}
+
+.voiceChoice {
+    margin: 0 0.6em 0 0.6em;
+}
+
+#content {
+    @include pane;
+    position: fixed;
+    top: 3 * $lh;
+    left: 0;
+    height: 100%;
+    overflow: scroll;
 }
 
 textarea {
@@ -72,7 +98,3 @@ input {
     //padding-left: 0.6* 8em;;
 }
 
-#content {
-    height: 100%;
-    width: 100%;
-}

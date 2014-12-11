@@ -14,6 +14,9 @@ appropreader seeks to explore a space of textual transformations with a differen
 
 ### why would we want to transformabalize?
 why would we want to make something more transformable?
+###
+- polyphonic
+- dialogic
 
 ##todo:
 - refactor `author` as `voice`
