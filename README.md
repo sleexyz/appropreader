@@ -19,12 +19,11 @@ why would we want to make something more transformable?
 - dialogic
 
 ##todo:
-- refactor `author` as `voice`
 - fix bug, that really long words break the Textarea invariants
-- differentiate between different voices (by color? by indent?)
-- implement switching between diffrent voices
+- play with right-align for different voices
 - On switch, implement read-only mode (textarea -> p) for everyone but the current voice
 - Implement hiding voices.
 - Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
+- fix editing for different voices
 
 
