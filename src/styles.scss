@@ -6,18 +6,21 @@
     margin-left: (0.6 * $chars_in_em);
 }
 
-$background: #000000;
-$foreground: #ffffff;
+$background: hsl(41, 92%, 95%);
+$foreground: #000000;
+
+$dark_background: #252726;
+$dark_foreground: #ffffff;
 
 $monospace-stack: Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New", Courier, monospace;
-$fontsize: 2.0vmin;
+$fontsize: 3.0vmin;
 $lh: 1.5em;
 
 
 .tab { @include offset(4em) }
 
 
-html, body, #Doc {
+html, body {
     font-family: $monospace-stack;
     font-size: 12px;
     font-size: $fontsize;
@@ -27,6 +30,8 @@ html, body, #Doc {
     height: 100%;
     padding: 0;
     overflow: hidden;
+    background: $background;
+    color: $foreground;
 }
 
 #Doc {
@@ -46,9 +51,12 @@ a {
 }
 
 header {
-    margin: 0.6em 0 0.6em 0;
+    margin-right: 15px;
+    padding: 0.6em;
     position: relative;
     height: $lh;
+    background: $dark_background;
+    color: $dark_foreground;
 }
 
 .VoiceChooser {
@@ -94,6 +102,8 @@ input {
 
     margin: 0;
     padding: 0;
+    padding-right: 1.2em;
+    background: none;
     //padding-left: 0.6* 8em;;
 }
 

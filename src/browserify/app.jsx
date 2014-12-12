@@ -62,11 +62,19 @@ var Doc = React.createClass({
             voices: {
                 "original": {
                     "name": "original",
-                    "color": "black",
+                    "color": {
+                        "h": 70,
+                        "s": "20%",
+                        "l": "50%",
+                    }
                 },
                 "me": {
                     "name": "me",
-                    "color": "black",
+                    "color": {
+                        "h": 170,
+                        "s": "20%",
+                        "l": "50%",
+                    }
                 }
             },
             currentVoice: "original"
@@ -116,20 +124,21 @@ var Doc = React.createClass({
         var items = [];
         this.state.blocks.forEach(function(block, blockIndex){
             var blockIndex = blockIndex;
+            var color = this.state.voices[block.voice].color;
             var style = {
-                "color": this.state.voices[block.voice].color,
+                "resize": "none"
             };
             if (this.state.currentVoice === block.voice) {
                 style = objectAssign({}, style, {
-                    "background": "#f2f2f2",
-                    "margin-left": "0em",
-                    "width": "calc(100% - 4.8em)",
+                    "borderRight": "0.6em solid " + hsla(color, 1),
+   //                 "marginLeft": "0em",
+    //                "width": "calc(100% - 4.8em)",
                 });
             } else {
                 style = objectAssign({}, style, {
-                    "background": "none",
-                    "margin-left": "4.8em",
-                    "width": "calc(100% - 4.8em)",
+                    "borderRight": "0.6em solid " + hsla(color, 1),
+ //                   "marginLeft": "4.8em",
+  //                  "width": "calc(100% - 4.8em)",
                     
                 });
             }
@@ -148,7 +157,7 @@ var Doc = React.createClass({
         return (
                 <div id={"Doc"}>
                     <header>
-                        <span> appropreader </span>
+                        <span> @ </span>
                         <VoiceChooser
                         changeVoiceFn={this.changeVoiceFn}
                         voices={this.state.voices}
@@ -191,9 +200,10 @@ var Block = React.createClass({
         if (!this.props.belongsToCurrentVoice) {
             console.log("not editable!");
             event.preventDefault();
-            
+            event.stopPropagation();
         } else {
             if (event.which == 8) { //backspace
+                console.log(event);
                 var textarea = this.refs["child"].getDOMNode();
                 if(textarea.value.length == 0 ) {
                     console.log("empty!");
@@ -261,17 +271,20 @@ var VoiceChoice = React.createClass({
         selected: React.PropTypes.bool,
         _key: React.PropTypes.string,
         changeVoiceFn: React.PropTypes.func
-            //color... I can vary it...
     },
     onClick: function(event) {
         return this.props.changeVoiceFn(this.props._key);
     },
     render: function() {
         var style = {
-            "color": this.props.color,
+            "borderRight": "5px solid " + hsla(this.props.color, 1),
         };
         if (this.props.selected) {
-            style["background"] =  "#f2f2f2";
+            //style["opacity"] =  1;
+            //style["background"] =  hsla(this.props.color, 1);
+        }else {
+            //style["opacity"] =  0.2;
+            //style["background"] =  hsla(this.props.color, 0.5);
         }
         return <span
             className={"voiceChoice"}
@@ -281,6 +294,10 @@ var VoiceChoice = React.createClass({
         </span>
     }
 });
+
+function hsla(color, alpha) {
+    return "hsla(" + color.h + "," + color.s + "," + color.l + "," + alpha + ")"
+}
 
 React.render(
         <Doc/>,
