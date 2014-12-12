@@ -23,5 +23,6 @@ why would we want to make something more transformable?
 - Implement hiding voices.
 - Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
 - Fix splitting
+- switch indent to additional feature, play with stuff
 
 
