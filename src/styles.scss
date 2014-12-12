@@ -10,21 +10,29 @@ $background: #000000;
 $foreground: #ffffff;
 
 $monospace-stack: Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New", Courier, monospace;
-$fontsize: 5.0vmin;
+$fontsize: 2.0vmin;
 $lh: 1.5em;
 
 
 .tab { @include offset(4em) }
 
-html {
-    height: 100%;
-}
 
-document, body {
+html, body, #Doc {
     font-family: $monospace-stack;
     font-size: 12px;
     font-size: $fontsize;
     line-height: $lh;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+}
+
+#Doc {
+    margin: 0 0.6em 0 0.6em;
+    width: calc(100% - 1.2em);
+    height: 100%;
 }
 
 h1 {
@@ -36,15 +44,10 @@ a {
     color: #999;
     text-decoration: none;
 }
-@mixin pane() {
-    margin: 0 0.6em 0 0.6em;
-    width: calc(100% - 1.2em);
-}
+
 header {
-    @include pane;
-    position: fixed;
-    top: $lh;
-    left: 0;
+    margin: 0.6em 0 0.6em 0;
+    position: relative;
     height: $lh;
 }
 
@@ -58,12 +61,8 @@ header {
 }
 
 #content {
-    @include pane;
-    position: fixed;
-    top: 3 * $lh;
-    left: 0;
-    height: 100%;
-    overflow: scroll;
+    overflow-y: auto;
+    height: calc(100% - 3.0em);
 }
 
 textarea {

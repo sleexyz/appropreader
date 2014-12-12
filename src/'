@@ -46,11 +46,11 @@ var Doc = React.createClass({
             voices: {
                 "original": {
                     "name": "original",
-                    "color": "black",
+                    "color": "#eeeee",
                 },
                 "me": {
                     "name": "me",
-                    "color": "black",
+                    "color": "#ff0000",
                 }
             },
             currentVoice: "original"
@@ -106,8 +106,8 @@ var Doc = React.createClass({
             var style = {
                 "color": this.state.voices[block.voice].color,
                 "background": (this.state.currentVoice === block.voice) 
-                    ? "#f2f2f2"
-                    : "none"
+                    ? "#dddddd"
+                    : "#ffffff"
             };
             items.push(<Block 
                     key={block.key}
@@ -150,7 +150,7 @@ var Block = React.createClass({
             event.preventDefault();
             
             if (event.which == 13) { //enter
-                var textarea = this.refs["child"].getDOMNode();
+                var textarea = this.refs["child"].getTextarea();
                 var strIndex = textarea.selectionStart;
                 this.props.splitFn(strIndex, this.props.blockIndex);
             }
@@ -168,7 +168,7 @@ var Block = React.createClass({
             
         } else {
             if (event.which == 8) { //backspace
-                var textarea = this.refs["child"].getDOMNode();
+                var textarea = this.refs["child"].getTextarea();
                 if(textarea.value.length == 0 ) {
                     console.log("empty!");
                 }
@@ -189,13 +189,11 @@ var Block = React.createClass({
         onKeyUp={this.onKeyUp}
         onChange={this.onChange}
         value={this.props.value}
-        rows={1}
         style={this.props.style}
         ref="child"
             />
     }
 });
-
 var VoiceChooser = React.createClass({
     propTypes: {
         changeVoiceFn: React.PropTypes.func,
@@ -245,7 +243,7 @@ var VoiceChoice = React.createClass({
             "color": this.props.color,
         };
         if (this.props.selected) {
-            style["background"] =  "#f2f2f2";
+            style["background"] =  "#eeeeee";
         }
         return <span
             className={"voiceChoice"}

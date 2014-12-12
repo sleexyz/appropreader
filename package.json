@@ -15,6 +15,7 @@
     "gulp-util": "^3.0.1",
     "marked": "^0.3.2",
     "react": "^0.12.1",
+    "react-textarea-autosize": "^1.0.4",
     "reactify": "^0.17.0",
     "serve-static": "^1.7.1",
     "tiny-lr": "^0.1.4",
