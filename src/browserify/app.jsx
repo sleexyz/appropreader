@@ -1,7 +1,7 @@
-var React = require('react');
-var assert = require('assert');
-var Textarea = require('react-textarea-autosize');
-var objectAssign = require("object-assign");
+var React = require('react'),
+    assert = require('assert'),
+    Textarea = require('react-textarea-autosize'),
+    objectAssign = require("object-assign");
 
 
 var states = [
@@ -83,7 +83,7 @@ var Doc = React.createClass({
     splitFn: function(strIndex, blockIndex) {
         //TODO:check for cases on splitting for nothing! (eg at the beginning/end
         //also make sure no invisible divs sneaking out, while checking for this
-        
+
         console.log("Split!", strIndex, blockIndex);
         var blocks = this.state.blocks;
 
@@ -120,38 +120,36 @@ var Doc = React.createClass({
         if (key == this.state.currentVoice) return;
         this.setState({"currentVoice": key});
     },
+    componentDidUpdate: function() {
+        console.log("State Changed!", this.state);
+    },
     render: function() {
         var items = [];
         this.state.blocks.forEach(function(block, blockIndex){
-            var blockIndex = blockIndex;
             var color = this.state.voices[block.voice].color;
-            var style = {
-                "resize": "none"
-            };
-            if (this.state.currentVoice === block.voice) {
-                style = objectAssign({}, style, {
-                    "borderRight": "0.6em solid " + hsla(color, 1),
-   //                 "marginLeft": "0em",
-    //                "width": "calc(100% - 4.8em)",
-                });
-            } else {
-                style = objectAssign({}, style, {
-                    "borderRight": "0.6em solid " + hsla(color, 1),
- //                   "marginLeft": "4.8em",
-  //                  "width": "calc(100% - 4.8em)",
-                    
-                });
+
+            var props = {
+                key: block.key,
+                value: block.value,
+                blockIndex: blockIndex,
+                belongsToCurrentVoice: (block.voice == this.state.currentVoice),
+                splitFn: this.splitFn,
+                deleteFn: this.deleteFn,
+                updateFn: this.updateFn,
+                toTextarea: {
+                    style: {
+                        "resize": "none",
+                        "borderRight": "0.6em solid " + hsla(color, 1),
+                    },
+                },
+                ref: "block" + blockIndex
             }
-            items.push(<Block 
-                    key={block.key}
-                    value={block.value}
-                    splitFn={this.splitFn}
-                    deleteFn={this.deleteFn}
-                    blockIndex={blockIndex}
-                    updateFn={this.updateFn}
-                    belongsToCurrentVoice={block.voice == this.state.currentVoice}
-                    style={style}
-                    ref={block + blockIndex}
+            if (this.state.currentVoice === block.voice) {
+            } else {
+                props.toTextarea.style.opacity = 0.4;
+            }
+            items.push(<Block
+                    {...props}
                     />);
         }.bind(this));
         return (
@@ -181,7 +179,7 @@ var Block = React.createClass({
         if (!this.props.belongsToCurrentVoice) {
             console.log("not editable!");
             event.preventDefault();
-            
+
             if (event.which == 13) { //enter
                 var textarea = this.refs["child"].getDOMNode();
                 var strIndex = textarea.selectionStart;
@@ -198,9 +196,7 @@ var Block = React.createClass({
     },
     onKeyUp: function(event) {
         if (!this.props.belongsToCurrentVoice) {
-            console.log("not editable!");
             event.preventDefault();
-            event.stopPropagation();
         } else {
             if (event.which == 8) { //backspace
                 console.log(event);
@@ -211,7 +207,11 @@ var Block = React.createClass({
             }
         }
     },
-
+    onKeyDown: function(event) {
+        if (!this.props.belongsToCurrentVoice) {
+            event.preventDefault();
+        }
+    },
     delete: function() {
         this.props.deleteFn(this.props.blockIndex);
     },
@@ -223,10 +223,11 @@ var Block = React.createClass({
             className={"Textarea"}
         onKeyPress={this.onKeyPress}
         onKeyUp={this.onKeyUp}
+        onKeyDown={this.onKeyDown}
         onChange={this.onChange}
         value={this.props.value}
         rows={1}
-        style={this.props.style}
+        {...this.props.toTextarea}
         ref="child"
             />
     }
