@@ -93,8 +93,8 @@ var Doc = React.createClass({
         var left = objectAssign({}, original, {value: origstr.slice(0, strIndex)});
 
         var mid = {
-            voice: "me",
-            value: "poop"
+            voice: this.state.currentVoice,
+            value: ""
         };
 
         var right = objectAssign({}, original, {value: origstr.slice(strIndex)});
@@ -177,7 +177,6 @@ var Block = React.createClass({
     },
     onKeyPress: function(event) {
         if (!this.props.belongsToCurrentVoice) {
-            console.log("not editable!");
             event.preventDefault();
 
             if (event.which == 13) { //enter
@@ -195,20 +194,20 @@ var Block = React.createClass({
         window.addEventListener("resize", this.forceUpdate);
     },
     onKeyUp: function(event) {
-        if (!this.props.belongsToCurrentVoice) {
-            event.preventDefault();
-        } else {
-            if (event.which == 8) { //backspace
-                console.log(event);
-                var textarea = this.refs["child"].getDOMNode();
-                if(textarea.value.length == 0 ) {
-                    console.log("empty!");
-                }
+        if (event.which == 8) { //backspace
+            console.log(event);
+            var textarea = this.refs["child"].getDOMNode();
+            if(textarea.value.length == 0 ) {
+                console.log("empty!");
             }
         }
     },
     onKeyDown: function(event) {
-        if (!this.props.belongsToCurrentVoice) {
+        console.log(event.which)
+        var desiredKey = (event.which == 8) || //backspace
+            (event.which == 46) || //delete
+            (event.ctrlKey && event.which == 88); //ctrl-x
+        if (desiredKey  && !this.props.belongsToCurrentVoice) {
             event.preventDefault();
         }
     },
@@ -216,7 +215,9 @@ var Block = React.createClass({
         this.props.deleteFn(this.props.blockIndex);
     },
     onChange: function(event) {
-        this.props.updateFn(event.target.value, this.props.blockIndex);
+        if (this.props.belongsToCurrentVoice){
+            this.props.updateFn(event.target.value, this.props.blockIndex);
+        }
     },
     render: function() {
         return <Textarea
