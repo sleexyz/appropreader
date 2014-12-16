@@ -19,18 +19,7 @@ var Block = React.createClass({
                 var strIndex = textarea.selectionStart;
                 this.props.splitFn(strIndex, this.props.blockIndex);
             }
-        }else {
-            if (event.which == 13) { //enter
-                this.refs.child.recalculateSize();
-            }
         }
-    },
-    shouldComponentUpdate: function(nextProps, nextState) {
-     //   return (nextProps.value !== this.props.value);
-        return true;
-    },
-    componentDidMount: function() {
-        //window.addEventListener("resize", this.forceUpdate);
     },
     onKeyUp: function(event) {
         if (event.which == 8) { //backspace
@@ -42,6 +31,7 @@ var Block = React.createClass({
         }
     },
     onKeyDown: function(event) {
+        console.log(event.which);
         var desiredKey = (event.which == 8) || //backspace
             (event.which == 46) || //delete
             (event.ctrlKey && event.which == 88); //ctrl-x
@@ -53,38 +43,40 @@ var Block = React.createClass({
         this.props.deleteFn(this.props.blockIndex);
     },
     onChange: function(event) {
-        if (this.props.belongsToCurrentVoice){
-            this.props.updateFn(event.target.value, this.props.blockIndex);
+        console.log(event);
+        var html = this.getDOMNode().innerHTML;
+        if (this.props.updateFn && html !== this.lastHtml) {
+            this.props.updateFn(html, this.props.blockIndex);
         }
-    },
-    componentWillUpdate: function() {
-        var node = this.refs.child.getDOMNode();
-        this.scrollHeight = node.scrollHeight;
-        this.scrollTop = node.scrollTop;
-    },
-    componentDidUpdate: function() {
-        //scrolling stuff 
-        var node = this.getDOMNode();
-        console.log({
-            "tagname": node.tagName,
-            "node.scrollTop": node.scrollTop,
-            "node.scrollHeight": node.scrollHeight,
-            "this.scrollTop": this.scrollTop,
-            "this.scrollHeight": this.scrollHeight});
-//        node.scrollTop = node.scrollHeight;
+        this.lastHtml = html;
     },
     render: function() {
-        return <Textarea
+        return <span
             className={"Textarea"}
+        contentEditable={true}
         onKeyPress={this.onKeyPress}
         onKeyUp={this.onKeyUp}
         onKeyDown={this.onKeyDown}
-        onChange={this.onChange}
-        value={this.props.value}
+        onInput={this.onChange}
+        onBlur={this.onChange}
         rows={1}
         {...this.props.toTextarea}
         ref="child"
-            />
+        dangerouslySetInnerHTML={{__html: this.props.html}}
+        />
+    },
+    shouldComponentUpdate: function(nextProps){
+        return nextProps.html !== this.getDOMNode().innerHTML;
+    },
+
+    componentDidUpdate: function() {
+        if ( this.props.html !== this.getDOMNode().innerHTML ) {
+            this.getDOMNode().innerHTML = this.props.html;
+        }
+    },
+
+    emitChange: function(){
     }
 });
+
 module.exports = Block;
