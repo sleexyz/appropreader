@@ -1,7 +1,9 @@
-var React = require('react'),
+var React = require('react/addons'),
     assert = require('assert'),
-    Textarea = require('react-textarea-autosize'),
-    objectAssign = require("object-assign");
+    objectAssign = require("object-assign"),
+    myUtil = require('./MyUtil.js'),
+    Block = require("./Block.jsx"),
+    VoiceChooser = require("./VoiceChooser.jsx");
 
 
 var states = [
@@ -111,17 +113,36 @@ var Doc = React.createClass({
 
     updateFn: function(value, blockIndex) {
         var blocks = this.state.blocks;
-        var block = blocks[blockIndex];
-        objectAssign(block, {"value": value});
+        var newState = React.addons.update(this.state, {
+            blocks: new function() {
+                var arr = [];
+                arr[blockIndex] = {};
+                arr[blockIndex].value = {$set: value};
+                return arr;
+            }()
+        });
+        this.setState(newState);
 
-        this.setState({blocks: blocks});
     },
     changeVoiceFn: function(key) {
         if (key == this.state.currentVoice) return;
         this.setState({"currentVoice": key});
     },
+    componentWillUpdate: function() {
+        var node = this.refs.content.getDOMNode();
+        this.scrollHeight = node.scrollHeight;
+        this.scrollTop = node.scrollTop;
+    },
     componentDidUpdate: function() {
-        console.log("State Changed!", this.state);
+        //scrolling stuff 
+        var node = this.refs.content.getDOMNode();
+        console.log({
+            "tagname": node.tagName,
+            "node.scrollTop": node.scrollTop,
+            "node.scrollHeight": node.scrollHeight,
+            "this.scrollTop": this.scrollTop,
+            "this.scrollHeight": this.scrollHeight});
+        //console.log("State Changed!", this.state);
     },
     render: function() {
         var items = [];
@@ -139,7 +160,7 @@ var Doc = React.createClass({
                 toTextarea: {
                     style: {
                         "resize": "none",
-                        "borderRight": "0.6em solid " + hsla(color, 1),
+                        "borderRight": "0.6em solid " + myUtil.hsla(color, 1),
                     },
                 },
                 ref: "block" + blockIndex
@@ -161,7 +182,7 @@ var Doc = React.createClass({
                         voices={this.state.voices}
                         currentVoice={this.state.currentVoice}/>
                     </header>
-                    <div id={"content"}>
+                    <div id={"content"} ref={"content"}>
                     {items}
                     </div>
                 </div>
@@ -169,137 +190,7 @@ var Doc = React.createClass({
     }
 });
 
-var Block = React.createClass({
-    propTypes: {
-        splitFn: React.PropTypes.func,
-        blockIndex: React.PropTypes.number,
-        belongsToCurrentVoice: React.PropTypes.bool
-    },
-    onKeyPress: function(event) {
-        if (!this.props.belongsToCurrentVoice) {
-            event.preventDefault();
 
-            if (event.which == 13) { //enter
-                var textarea = this.refs["child"].getDOMNode();
-                var strIndex = textarea.selectionStart;
-                this.props.splitFn(strIndex, this.props.blockIndex);
-            }
-        }else {
-            if (event.which == 13) { //enter
-                this.refs.child.recalculateSize();
-            }
-        }
-    },
-    componentDidMount: function() {
-        window.addEventListener("resize", this.forceUpdate);
-    },
-    onKeyUp: function(event) {
-        if (event.which == 8) { //backspace
-            console.log(event);
-            var textarea = this.refs["child"].getDOMNode();
-            if(textarea.value.length == 0 ) {
-                console.log("empty!");
-            }
-        }
-    },
-    onKeyDown: function(event) {
-        console.log(event.which)
-        var desiredKey = (event.which == 8) || //backspace
-            (event.which == 46) || //delete
-            (event.ctrlKey && event.which == 88); //ctrl-x
-        if (desiredKey  && !this.props.belongsToCurrentVoice) {
-            event.preventDefault();
-        }
-    },
-    delete: function() {
-        this.props.deleteFn(this.props.blockIndex);
-    },
-    onChange: function(event) {
-        if (this.props.belongsToCurrentVoice){
-            this.props.updateFn(event.target.value, this.props.blockIndex);
-        }
-    },
-    render: function() {
-        return <Textarea
-            className={"Textarea"}
-        onKeyPress={this.onKeyPress}
-        onKeyUp={this.onKeyUp}
-        onKeyDown={this.onKeyDown}
-        onChange={this.onChange}
-        value={this.props.value}
-        rows={1}
-        {...this.props.toTextarea}
-        ref="child"
-            />
-    }
-});
-
-var VoiceChooser = React.createClass({
-    propTypes: {
-        changeVoiceFn: React.PropTypes.func,
-        voices: React.PropTypes.object,
-        currentVoice: React.PropTypes.string
-    },
-    render: function() {
-        var voicechoices = [];
-        Object.keys(this.props.voices).map(function(key){
-            var voice = this.props.voices[key];
-
-            if (this.props.currentVoice === key) {
-                voice.selected = true;
-                voice.key = key;
-                voice._key = key;
-            } else{
-                voice.selected = false;
-                voice.key = key;
-                voice._key = key;
-            }
-
-            var voicechoice = <VoiceChoice
-                {...voice}
-                changeVoiceFn={this.props.changeVoiceFn}
-                />
-            voicechoices.push(voicechoice);
-        }.bind(this));
-        return <span className={"VoiceChooser"}>
-                    {voicechoices}
-                </span>
-    }
-});
-
-var VoiceChoice = React.createClass({
-    propTypes: {
-        name: React.PropTypes.string,
-        selected: React.PropTypes.bool,
-        _key: React.PropTypes.string,
-        changeVoiceFn: React.PropTypes.func
-    },
-    onClick: function(event) {
-        return this.props.changeVoiceFn(this.props._key);
-    },
-    render: function() {
-        var style = {
-            "borderRight": "5px solid " + hsla(this.props.color, 1),
-        };
-        if (this.props.selected) {
-            //style["opacity"] =  1;
-            //style["background"] =  hsla(this.props.color, 1);
-        }else {
-            //style["opacity"] =  0.2;
-            //style["background"] =  hsla(this.props.color, 0.5);
-        }
-        return <span
-            className={"voiceChoice"}
-            onClick={this.onClick}
-            style={style}>
-            {this.props.name}
-        </span>
-    }
-});
-
-function hsla(color, alpha) {
-    return "hsla(" + color.h + "," + color.s + "," + color.l + "," + alpha + ")"
-}
 
 React.render(
         <Doc/>,

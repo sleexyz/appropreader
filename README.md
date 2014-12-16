@@ -19,10 +19,7 @@ why would we want to make something more transformable?
 - dialogic
 
 ##todo:
-- play with right-align for different voices
-- Implement hiding voices.
 - Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
-- Fix splitting
-- switch indent to additional feature, play with stuff
+    - Implement hiding voices.
 
 
