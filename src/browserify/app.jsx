@@ -9,11 +9,19 @@ var React = require('react/addons'),
 var states = [
     {
         voice: "original",
-        html: "poop"
+        text: "Hello"
     },
     {
         voice: "me",
-        html: "poopie"
+        text: "Hi.\nWhat is this?"
+    },
+    {
+        voice: "original",
+        text: "This is a nonlinear conversation"
+    },
+    {
+        voice: "me",
+        text: "Cool..."
     },
 ];
 
@@ -66,47 +74,27 @@ var Doc = React.createClass({
             currentVoice: "original"
         };
     },
-    splitFn: function(strIndex, blockIndex) {
-        //TODO:check for cases on splitting for nothing! (eg at the beginning/end
-        //also make sure no invisible divs sneaking out, while checking for this
-
-        console.log("Split!", strIndex, blockIndex);
-        var blocks = this.state.blocks;
-
-        var original = blocks[blockIndex];
-        var origstr = blocks[blockIndex].value;
-
-        var left = objectAssign({}, original, {value: origstr.slice(0, strIndex)});
-
-        var mid = {
-            voice: this.state.currentVoice,
-            value: ""
-        };
-
-        var right = objectAssign({}, original, {value: origstr.slice(strIndex)});
-
-        blocks.splice(blockIndex, 1, genBlock(left), genBlock(mid), genBlock(right));
-        this.setState({blocks: blocks});
-    },
-
-    deleteFn: function(blockIndex) {
-        var blocks = this.state.blocks;
-        blocks.splice(blockIndex,1);
-        this.setState({blocks: blocks});
-    },
-
-    updateFn: function(html, blockIndex) {
+        /**
+         * Updates html of a block
+         * @param html
+         * @param blockIndex
+         */
+    updateFn: function(text, blockIndex) {
         var blocks = this.state.blocks;
         var newState = React.addons.update(this.state, {
             blocks: new function() {
                 var arr = [];
                 arr[blockIndex] = {};
-                arr[blockIndex].html = {$set: html};
+                arr[blockIndex].text= {$set: text};
                 return arr;
             }()
         });
         this.setState(newState);
     },
+        /**
+         * changes current voice
+         * @param key
+         */
     changeVoiceFn: function(key) {
         if (key == this.state.currentVoice) return;
         this.setState({"currentVoice": key});
@@ -121,38 +109,35 @@ var Doc = React.createClass({
         this.scrollTop = node.scrollTop;
     },
     componentDidUpdate: function() {
-        console.log("State Changed!", this.state);
+        this.state.blocks.forEach(function(block) {
+            console.log(block);
+        });
     },
     render: function() {
-        var items = [];
+        var blocks = [];
         this.state.blocks.forEach(function(block, blockIndex){
             var color = this.state.voices[block.voice].color;
 
             var props = {
-                key: block.key,
-                html: block.html,
+                id: "block" + blockIndex,
+                text: block.text,
                 blockIndex: blockIndex,
-                belongsToCurrentVoice: (block.voice == this.state.currentVoice),
-                splitFn: this.splitFn,
-                deleteFn: this.deleteFn,
+                editable: (block.voice == this.state.currentVoice),
                 updateFn: this.updateFn,
-                toTextarea: {
-                    style: {
-                        "resize": "none",
-                        "display": "inline",
-                        "whiteSpace": "pre-wrap",
-                        //"borderRight": "0.6em solid " + myUtil.hsla(color, 1),
-                    },
+                style: {
+                    "resize": "none",
+                    "whiteSpace": "pre-wrap",
+                    //"borderRight": "0.6em solid " + myUtil.hsla(color, 1),
                 },
                 ref: "block" + blockIndex
             }
             if (this.state.currentVoice === block.voice) {
             } else {
-                props.toTextarea.style.color = "rgba(0,0,0,0.4)";
+                props.style.color = "rgba(0,0,0,0.4)";
             }
-            items.push(<Block
+            blocks.push(<div key={block.key}><Block
                     {...props}
-                    />);
+                    /></div>);
         }.bind(this));
         return (
                 <div id={"Doc"}>
@@ -163,12 +148,14 @@ var Doc = React.createClass({
                         voices={this.state.voices}
                         currentVoice={this.state.currentVoice}/>
                     </header>
-                    <div id={"content"} ref={"content"}>
-                    {items}
+                    <div id={"contentContainer"}>
+                        <div id={"content"} ref={"content"}>
+                            {blocks}
+                        </div >
                     </div>
                 </div>
                );
-    }
+    },
 });
 
 

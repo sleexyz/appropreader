@@ -73,20 +73,14 @@ header {
     margin: 0 0.6em 0 0.6em;
 }
 
-#content {
+#contentContainer {
     overflow-y: auto;
     height: calc(100% - 3.0em);
 }
+#content {
+    display: block;
+}
 
-textarea {
-    padding: 0;
-    margin: 0;
-    line-height: $lh;
-    min-height: 0x;
-}
-input {
-    white-space: pre-wrap;
-}
 
 .Textarea{
     outline: 0px solid transparent;
@@ -107,7 +101,5 @@ input {
 
     margin: 0;
     padding: 0;
-//    padding-right: 1.2em;
     background: none;
-    //padding-left: 0.6* 8em;;
 }

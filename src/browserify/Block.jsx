@@ -8,75 +8,71 @@ var Block = React.createClass({
     propTypes: {
         splitFn: React.PropTypes.func,
         blockIndex: React.PropTypes.number,
-        belongsToCurrentVoice: React.PropTypes.bool
-    },
-    onKeyPress: function(event) {
-        if (!this.props.belongsToCurrentVoice) {
-            event.preventDefault();
-
-            if (event.which == 13) { //enter
-                var textarea = this.refs["child"].getDOMNode();
-                var strIndex = textarea.selectionStart;
-                this.props.splitFn(strIndex, this.props.blockIndex);
-            }
-        }
-    },
-    onKeyUp: function(event) {
-        if (event.which == 8) { //backspace
-            console.log(event);
-            var textarea = this.refs["child"].getDOMNode();
-            if(textarea.value.length == 0 ) {
-                console.log("empty!");
-            }
-        }
+        editable: React.PropTypes.bool
     },
     onKeyDown: function(event) {
-        console.log(event.which);
-        var desiredKey = (event.which == 8) || //backspace
-            (event.which == 46) || //delete
-            (event.ctrlKey && event.which == 88); //ctrl-x
-        if (desiredKey  && !this.props.belongsToCurrentVoice) {
+        console.log("keydown: ", event.which);
+        var passchars = [33, 34, 35, 36, 37, 38, 39 ,40, 9]; //we allow arrow keys
+        var pass = false;
+        for (var i = 0; i < passchars.length; i++) {
+            pass = pass || (passchars[i] === event.which);
+            if (pass) break;
+        }
+        if (this.props.editable || pass) { 
+        } else {
             event.preventDefault();
         }
     },
-    delete: function() {
-        this.props.deleteFn(this.props.blockIndex);
+    onKeyPress: function(event) {
+        console.log("keypress: ", event.which);
     },
+    onPaste: function(event) {
+        console.log(event.clipboardData);
+    },
+    /**
+     * Fired by parent node
+     * @param id id of changed element
+     */
     onChange: function(event) {
-        console.log(event);
-        var html = this.getDOMNode().innerHTML;
-        if (this.props.updateFn && html !== this.lastHtml) {
-            this.props.updateFn(html, this.props.blockIndex);
+        if (this.props.editable) {
+            var newText= this.getDOMNode().textContent;
+            if (newText!== this.lastText) {
+                this.props.updateFn(newText, this.props.blockIndex);
+            }
+            this.lastText = newText; //update internal state
+        } else {
+            this.refreshDOM();
         }
-        this.lastHtml = html;
+    },
+    refreshDOM: function() {
+            this.getDOMNode().textContent = this.lastText;
     },
     render: function() {
         return <span
+            contentEditable={true}
+            id={this.props.id}
             className={"Textarea"}
-        contentEditable={true}
-        onKeyPress={this.onKeyPress}
-        onKeyUp={this.onKeyUp}
-        onKeyDown={this.onKeyDown}
-        onInput={this.onChange}
-        onBlur={this.onChange}
-        rows={1}
-        {...this.props.toTextarea}
-        ref="child"
-        dangerouslySetInnerHTML={{__html: this.props.html}}
-        />
+            onInput={this.onChange}
+            onKeyDown={this.onKeyDown}
+            onKeyPress={this.onKeyPress}
+            onPaste={this.onPaste}
+            ref={"child"}
+            style={this.props.style}
+        >{this.props.text}</span>
     },
     shouldComponentUpdate: function(nextProps){
-        return nextProps.html !== this.getDOMNode().innerHTML;
+        return nextProps.text !== this.getDOMNode().textContent;
+    },
+    componentDidMount: function() {
+        this.lastText= this.getDOMNode().textContent; //lastHTML is a non-react-state, object-specific state variable
     },
 
     componentDidUpdate: function() {
-        if ( this.props.html !== this.getDOMNode().innerHTML ) {
-            this.getDOMNode().innerHTML = this.props.html;
+        if ( this.props.text !== this.getDOMNode().textContent) {
+            this.getDOMNode().textContent = this.props.text;
         }
     },
 
-    emitChange: function(){
-    }
 });
 
 module.exports = Block;
