@@ -31,7 +31,7 @@ var states = [
  * Really just gives unique key to block.
  * Every time a block mutates, it needs to get a new block state.
  */
-var genBlock = (function (){
+var _genBlock = (function (){
     var counter = 0;
 
     function nextKey() {
@@ -51,7 +51,7 @@ var Doc = React.createClass({
     getInitialState: function() {
         return {
             blocks: states.map(function(state) {
-                return genBlock(state);
+                return _genBlock(state);
             }),
             voices: {
                 "original": {
@@ -75,21 +75,32 @@ var Doc = React.createClass({
         };
     },
         /**
-         * Updates html of a block
-         * @param html
+         * Updates text of a block
          * @param blockIndex
+         * @param text
          */
-    updateFn: function(text, blockIndex) {
-        var blocks = this.state.blocks;
+    updateFn: function(blockIndex, text, callback) {
         var newState = React.addons.update(this.state, {
-            blocks: new function() {
+            "blocks": (function() {
                 var arr = [];
                 arr[blockIndex] = {};
                 arr[blockIndex].text= {$set: text};
                 return arr;
-            }()
+            })()
         });
-        this.setState(newState);
+        this.setState(newState, callback);
+    },
+        /**
+         * deletes block
+         * @param blockIndex
+         */
+    deleteFn: function(blockIndex, callback) {
+        var newState = React.addons.update(this.state, {
+            "blocks": {
+                "$splice": [[blockIndex, 1]]
+            }
+        });
+        this.setState(newState, callback);
     },
         /**
          * changes current voice
@@ -98,17 +109,62 @@ var Doc = React.createClass({
     changeVoiceFn: function(key) {
         if (key == this.state.currentVoice) return;
         this.setState({"currentVoice": key});
-        this.state.blocks.forEach(function(block, blockIndex) {
-            console.log("forcingUpdate of block" + blockIndex);
-            this.refs["block" + blockIndex].forceUpdate();
-        }.bind(this));
     },
-    componentWillUpdate: function() {
-        var node = this.refs.content.getDOMNode();
-        this.scrollHeight = node.scrollHeight;
-        this.scrollTop = node.scrollTop;
+        /**
+         * Splits block
+         * @param blockIndex
+         * @param caretPos
+         */
+    splitFn: function(blockIndex, caretPos) {
+        var block = this.state.blocks[blockIndex];
+        var text = block.text
+        var left = text.slice(0, caretPos)
+        var right = text.slice(caretPos);
+        if (left.length === 0) {
+            var newState = React.addons.update(this.state, {
+                "blocks": {
+                    "$splice": [[blockIndex, 0, this._newBlock()]]
+                }
+            });
+            this.setState(newState, function() {
+                this._reconcile(blockIndex);
+            });
+        }
+    },
+        /**
+         * combines contiguous blocks of the same owner
+         * @param blockIndex
+         */
+    _reconcile: function(blockIndex) {
+        var left = this.state.blocks[blockIndex - 1];
+        var mid = this.state.blocks[blockIndex];
+        console.log([left.text, mid.text]);
+ //       var right = this.state.blocks[blockIndex + 1];
+        if (left) {
+            if (left.voice === mid.voice) {
+                this.updateFn(blockIndex - 1, left.text + mid.text, function() {
+                    this.deleteFn(blockIndex, function() {
+                        var elem = document.getElementById("block" + (blockIndex - 1));
+                        elem.focus();
+                        var range = document.createRange();
+                        range.selectNodeContents(elem);
+                        range.collapse(false);
+                        selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }.bind(this));
+                }.bind(this));
+            }
+        }
+    },
+    _newBlock: function() {
+        return _genBlock({
+            "voice": this.state.currentVoice,
+            "text": "\n"
+        });
     },
     componentDidUpdate: function() {
+        console.log("");
         this.state.blocks.forEach(function(block) {
             console.log(block);
         });
@@ -124,16 +180,8 @@ var Doc = React.createClass({
                 blockIndex: blockIndex,
                 editable: (block.voice == this.state.currentVoice),
                 updateFn: this.updateFn,
-                style: {
-                    "resize": "none",
-                    "whiteSpace": "pre-wrap",
-                    //"borderRight": "0.6em solid " + myUtil.hsla(color, 1),
-                },
+                splitFn: this.splitFn,
                 ref: "block" + blockIndex
-            }
-            if (this.state.currentVoice === block.voice) {
-            } else {
-                props.style.color = "rgba(0,0,0,0.4)";
             }
             blocks.push(<div key={block.key}><Block
                     {...props}

@@ -17,7 +17,7 @@ var paths = {
     sass: ["./src/*.scss"],
     jade: ["./src/**/index.jade"],
     js: ["./src/**/*.js", '!./src/browserify/**/*js'],
-    browserify: ["./src/browserify/**.js", "./src/browserify/app.jsx"],
+    browserify: ["./src/browserify/**.js", "./src/browserify/**.jsx"],
     app_js: ["./src/browserify/app.jsx"]
 }
 

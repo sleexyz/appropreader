@@ -19,8 +19,10 @@ why would we want to make something more transformable?
 - dialogic
 
 ##todo:
+- enable tab navigation
 - do split!
-- Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
+    - Implement a neighbor reconciliation (when two adjacent blocks are of the same voice, converge blocks.
     - Implement hiding voices.
+- do delete!
 
 

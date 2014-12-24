@@ -20,6 +20,10 @@ var Block = React.createClass({
         }
         if (this.props.editable || pass) { 
         } else {
+            if (event.which === 13) { //enter
+                var caretPos = getCaretCharacterOffsetWithin(this.getDOMNode());
+                this.props.splitFn(this.props.blockIndex, caretPos);
+            }
             event.preventDefault();
         }
     },
@@ -37,7 +41,7 @@ var Block = React.createClass({
         if (this.props.editable) {
             var newText= this.getDOMNode().textContent;
             if (newText!== this.lastText) {
-                this.props.updateFn(newText, this.props.blockIndex);
+                this.props.updateFn(this.props.blockIndex, newText);
             }
             this.lastText = newText; //update internal state
         } else {
@@ -48,6 +52,13 @@ var Block = React.createClass({
             this.getDOMNode().textContent = this.lastText;
     },
     render: function() {
+        var style = {
+        };
+        if (this.props.editable) {
+            style["opacity"] = 1;
+        } else {
+            style["opacity"] = 0.5;
+        }
         return <span
             contentEditable={true}
             id={this.props.id}
@@ -57,14 +68,15 @@ var Block = React.createClass({
             onKeyPress={this.onKeyPress}
             onPaste={this.onPaste}
             ref={"child"}
-            style={this.props.style}
+            style={style}
         >{this.props.text}</span>
     },
     shouldComponentUpdate: function(nextProps){
-        return nextProps.text !== this.getDOMNode().textContent;
+        return ((nextProps.text !== this.getDOMNode().textContent) ||
+            (nextProps.editable !== this.props.editable));
     },
     componentDidMount: function() {
-        this.lastText= this.getDOMNode().textContent; //lastHTML is a non-react-state, object-specific state variable
+        this.lastText= this.getDOMNode().textContent; //lastText is a non-react-state, object-specific state variable
     },
 
     componentDidUpdate: function() {
@@ -74,5 +86,28 @@ var Block = React.createClass({
     },
 
 });
+
+/*
+ * From http://stackoverflow.com/questions/4811822/get-a-ranges-start-and-end-offsets-relative-to-its-parent-container/4812022#4812022
+ */
+function getCaretCharacterOffsetWithin(element) {
+    var caretOffset = 0;
+    if (typeof window.getSelection != "undefined") {
+        var range = window.getSelection().getRangeAt(0);
+        var preCaretRange = range.cloneRange();
+        preCaretRange.selectNodeContents(element);
+        preCaretRange.setEnd(range.endContainer, range.endOffset);
+        caretOffset = preCaretRange.toString().length;
+    } else if (typeof document.selection != "undefined" && document.selection.type != "Control") {
+        var textRange = document.selection.createRange();
+        var preCaretTextRange = document.body.createTextRange();
+        preCaretTextRange.moveToElementText(element);
+        preCaretTextRange.setEndPoint("EndToEnd", textRange);
+        caretOffset = preCaretTextRange.text.length;
+    }
+    return caretOffset;
+}
+
+
 
 module.exports = Block;
