@@ -17,11 +17,11 @@ var states = [
     },
     {
         voice: "original",
-        text: "This is a nonlinear conversation"
+        text: "This is a nonlinear conversation."
     },
     {
         voice: "me",
-        text: "Cool..."
+        text: "Oh\nSeems pretty linear to me..."
     },
 ];
 
@@ -142,7 +142,6 @@ var Doc = React.createClass({
         return (
                 <div id={"Doc"}>
                     <header>
-                        <span> @ </span>
                         <VoiceChooser
                         changeVoiceFn={this.changeVoiceFn}
                         voices={this.state.voices}

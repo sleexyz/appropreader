@@ -6,15 +6,14 @@
     margin-left: (0.6 * $chars_in_em);
 }
 
-$background: hsl(41, 92%, 95%);
+$background: hsl(41, 92%, 97%);
 $foreground: #000000;
 
-$dark_background: #252726;
-$dark_foreground: #ffffff;
 
 $monospace-stack: Monaco, "Lucida Console", "DejaVu Sans Mono", "Courier New", Courier, monospace;
-$cool: Georgia, "Times New Roman";
-$font: $cool;
+$serif-stack: Georgia, "Times New Roman";
+$sans-stack: Arial;
+$font: $serif-stack;
 $fontsize: 14px;
 $lh: 1.5em;
 
@@ -36,7 +35,6 @@ html, body {
 }
 body {
   margin-left: 10%;
-  margin-right: 10%;
 }
 
 #Doc {
@@ -55,18 +53,20 @@ a {
 }
 
 header {
-    font-family: $monospace-stack;
-    margin-right: 15px;
-    padding: 0.6em;
-    position: relative;
+    font-family: $serif-stack;
+    position: fixed;
+    right: 0;
+    width: 100%;;
     height: $lh;
-    background: $dark_background;
-    color: $dark_foreground;
 }
 
 .VoiceChooser {
     position: absolute;
     right: 0.6em;
+    opacity: 0.5;
+}
+.VoiceChooser:hover {
+    opacity: 1;
 }
 
 .voiceChoice {
@@ -74,6 +74,7 @@ header {
 }
 
 #contentContainer {
+    padding-top: $lh;
     overflow-y: auto;
     height: calc(100% - 3.0em);
 }
