@@ -9,19 +9,19 @@ var React = require('react/addons'),
 var states = [
     {
         voice: "original",
-        text: "Hello"
+        text: "Hello\n"
     },
     {
         voice: "me",
-        text: "Hi.\nWhat is this?"
+        text: "Hi.\nWhat is this?\n"
     },
     {
         voice: "original",
-        text: "This is a nonlinear conversation."
+        text: "This is a nonlinear conversation.\n"
     },
     {
         voice: "me",
-        text: "Oh\nSeems pretty linear to me..."
+        text: "Oh\nSeems pretty linear to me...\n"
     },
 ];
 
@@ -127,35 +127,74 @@ var Doc = React.createClass({
                 }
             });
             this.setState(newState, function() {
-                this._reconcile(blockIndex);
+                this._reconcile(blockIndex - 1, function() {
+                    this._focusEnd(blockIndex - 1);
+                }.bind(this), function() {
+                    this._focusEnd(blockIndex);
+                }.bind(this));
+            }.bind(this));
+        } else if ((right.length === 0)
+                || ((right.length === 1) && (right === '\n'))) {
+            var newState = React.addons.update(this.state, {
+                "blocks": {
+                    "$splice": [[blockIndex + 1, 0, this._newBlock()]]
+                }
             });
+            this.setState(newState, function() {
+                this._reconcile(blockIndex + 1, function() {
+                    this._focusBeginning(blockIndex + 1);
+                }.bind(this), function() {
+                    this._focusBeginning(blockIndex + 1);
+                }.bind(this));
+            }.bind(this));
         }
     },
         /**
          * combines contiguous blocks of the same owner
          * @param blockIndex
          */
-    _reconcile: function(blockIndex) {
-        var left = this.state.blocks[blockIndex - 1];
-        var mid = this.state.blocks[blockIndex];
-        console.log([left.text, mid.text]);
- //       var right = this.state.blocks[blockIndex + 1];
-        if (left) {
-            if (left.voice === mid.voice) {
-                this.updateFn(blockIndex - 1, left.text + mid.text, function() {
-                    this.deleteFn(blockIndex, function() {
-                        var elem = document.getElementById("block" + (blockIndex - 1));
-                        elem.focus();
-                        var range = document.createRange();
-                        range.selectNodeContents(elem);
-                        range.collapse(false);
-                        selection = window.getSelection();
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }.bind(this));
+    _reconcile: function(blockIndex, cb, failcb) {
+        var left = this.state.blocks[blockIndex];
+        var right = this.state.blocks[blockIndex + 1];
+        if (left && right) {
+            if (left.voice === right.voice) {
+                this.updateFn(blockIndex, left.text + right.text, function() {
+                    this.deleteFn(blockIndex + 1, cb);
                 }.bind(this));
             }
+        } else {
+            failcb();
         }
+    },
+        /**
+         * Changes focus to the block with the given blockIndex
+         * Goes to beginning
+         * @param blockIndex
+         */
+    _focusBeginning: function(blockIndex) {
+        var elem = document.getElementById("block" + (blockIndex));
+       // elem.focus();
+        var range = document.createRange();
+        range.selectNodeContents(elem);
+        range.collapse(true);
+        selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    },
+        /**
+         * Changes focus to the block with the given blockIndex
+         * Goes to end
+         * @param blockIndex
+         */
+    _focusEnd: function(blockIndex) {
+        var elem = document.getElementById("block" + (blockIndex));
+       // elem.focus();
+        var range = document.createRange();
+        range.selectNodeContents(elem);
+        range.collapse(false);
+        selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
     },
     _newBlock: function() {
         return _genBlock({
