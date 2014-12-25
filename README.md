@@ -19,8 +19,5 @@ why would we want to make something more transformable?
 - dialogic
 
 ##todo:
-- enable tab navigation
 - Implement hiding voices.
-- do delete!
-
 

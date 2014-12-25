@@ -91,7 +91,12 @@ var Doc = React.createClass({
          * deletes block
          * @param blockIndex
          */
-    deleteFn: function(blockIndex, callback) {
+    deleteFn: function(blockIndex) {
+        this._deleteFn(blockIndex, function() {
+            this._combine(blockIndex - 1);
+        }.bind(this));
+    },
+    _deleteFn: function(blockIndex, callback) {
         var newState = React.addons.update(this.state, {
             "blocks": {
                 "$splice": [[blockIndex, 1]]
@@ -124,7 +129,7 @@ var Doc = React.createClass({
                 }
             });
             this.setState(newState, function() {
-                this._reconcile(blockIndex - 1, function() {
+                this._combine(blockIndex - 1, function() {
                     this._focusEnd(blockIndex - 1);
                 }.bind(this), function() {
                     this._focusEnd(blockIndex);
@@ -138,7 +143,7 @@ var Doc = React.createClass({
                 }
             });
             this.setState(newState, function() {
-                this._reconcile(blockIndex + 1, function() {
+                this._combine(blockIndex + 1, function() {
                     this._focusBeginning(blockIndex + 1);
                 }.bind(this), function() {
                     this._focusBeginning(blockIndex + 1);
@@ -166,11 +171,14 @@ var Doc = React.createClass({
     },
         /**
          * combines contiguous blocks of the same owner
+         * specifically, combines blocks[blockIndex] and blocks[blockIndex+1]
+         * If not same owner, or if one of the blocks don't exist, then run failcb
+         *
          * @param blockIndex
          * @param cb
          * @param failcb
          */
-    _reconcile: function(blockIndex, cb, failcb) {
+    _combine: function(blockIndex, cb, failcb) {
         var left = this.state.blocks[blockIndex];
         var right = this.state.blocks[blockIndex + 1];
         if (left && right) {
@@ -178,9 +186,12 @@ var Doc = React.createClass({
                 this.updateFn(blockIndex, left.text + right.text, function() {
                     this.deleteFn(blockIndex + 1, cb);
                 }.bind(this));
+            }else {
+                //uh oh, invariant is broken! (?)
+                //console.log("Uh-oh, invariant is broken!");
             }
         } else {
-            failcb();
+            failcb && failcb();
         }
     },
         /**
