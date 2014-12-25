@@ -19,6 +19,14 @@ var Block = React.createClass({
             if (pass) break;
         }
         if (this.props.editable || pass) { 
+            if (event.which === 8) { //backspace
+                console.log(this.props.text.length);
+                if ((this.props.text.length === 0) ||
+                        ((this.props.text.length === 1) && this.props.text === "\n")) {
+                    this.props.deleteFn(this.props.blockIndex);
+                    event.preventDefault();
+                } 
+            }
         } else {
             if (event.which === 13) { //enter
                 var caretPos = myUtil.getCaretCharacterOffsetWithin(this.getDOMNode());

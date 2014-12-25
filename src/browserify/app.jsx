@@ -237,6 +237,7 @@ var Doc = React.createClass({
                 editable: (block.voice == this.state.currentVoice),
                 updateFn: this.updateFn,
                 splitFn: this.splitFn,
+                deleteFn: this.deleteFn,
                 ref: "block" + blockIndex
             }
             blocks.push(<div key={block.key}><Block
