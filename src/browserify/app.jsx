@@ -89,13 +89,20 @@ var Doc = React.createClass({
     },
         /**
          * deletes block
+         * public facing (given to Block)
          * @param blockIndex
          */
     deleteFn: function(blockIndex) {
         this._deleteFn(blockIndex, function() {
-            this._combine(blockIndex - 1);
+            this._combine(blockIndex - 1, null, null);
         }.bind(this));
     },
+        /**
+         * deletes block
+         * private facing 
+         * @param blockIndex
+         * @param callback
+         */
     _deleteFn: function(blockIndex, callback) {
         var newState = React.addons.update(this.state, {
             "blocks": {
@@ -130,8 +137,10 @@ var Doc = React.createClass({
             });
             this.setState(newState, function() {
                 this._combine(blockIndex - 1, function() {
+                    console.log("focusing");
                     this._focusEnd(blockIndex - 1);
                 }.bind(this), function() {
+                    console.log("focusing");
                     this._focusEnd(blockIndex);
                 }.bind(this));
             }.bind(this));
@@ -184,12 +193,11 @@ var Doc = React.createClass({
         if (left && right) {
             if (left.voice === right.voice) {
                 this.updateFn(blockIndex, left.text + right.text, function() {
-                    this.deleteFn(blockIndex + 1, cb);
+                    this._deleteFn(blockIndex + 1, cb);
                 }.bind(this));
-            }else {
+            }
                 //uh oh, invariant is broken! (?)
                 //console.log("Uh-oh, invariant is broken!");
-            }
         } else {
             failcb && failcb();
         }
