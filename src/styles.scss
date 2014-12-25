@@ -35,6 +35,7 @@ html, body {
 }
 body {
   margin-left: 10%;
+  margin-right: 10%;
 }
 
 #Doc {
@@ -64,6 +65,7 @@ header {
     position: absolute;
     right: 0.6em;
     opacity: 0.5;
+    transition: opacity 0.2s ease-out;
 }
 .VoiceChooser:hover {
     opacity: 1;
@@ -83,10 +85,7 @@ header {
 }
 
 
-.Textarea{
-    outline: 0px solid transparent;
-    border: none;
-    box-sizing: border-box;
+.block {
 
     font-size: $fontsize;
     font-family: $font;
@@ -97,10 +96,27 @@ header {
 
     overflow-x: none;
     overflow-y: hidden;
-    width: 100%;
+    width: 80%;
 
 
     margin: 0;
     padding: 0;
     background: none;
+    transition: opacity 5s ease;
+    transition: padding-left 5s ease;
+}
+
+.blockContents {
+    outline: 0px solid transparent;
+    border: none;
+    box-sizing: border-box;
+}
+
+.block-editable {
+    opacity: 1;
+    padding-left: 0;
+}
+.block-noneditable {
+    opacity: 0.5;
+    padding-left: 20%;
 }

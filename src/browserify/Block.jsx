@@ -29,7 +29,7 @@ var Block = React.createClass({
             }
         } else {
             if (event.which === 13) { //enter
-                var caretPos = myUtil.getCaretCharacterOffsetWithin(this.getDOMNode());
+                var caretPos = myUtil.getCaretCharacterOffsetWithin(this.refs.child.getDOMNode());
                 this.props.splitFn(this.props.blockIndex, caretPos);
             }
             event.preventDefault();
@@ -47,7 +47,7 @@ var Block = React.createClass({
          */
     onChange: function(event) {
         if (this.props.editable) {
-            var newText= this.getDOMNode().textContent;
+            var newText = this.refs.child.getDOMNode().textContent;
             if (newText!== this.lastText) {
                 this.props.updateFn(this.props.blockIndex, newText);
             }
@@ -57,39 +57,42 @@ var Block = React.createClass({
         }
     },
     refreshDOM: function() {
-        this.getDOMNode().textContent = this.lastText;
+        this.refs.child.getDOMNode().textContent = this.lastText;
     },
     render: function() {
-        var style = {
-        };
-        if (this.props.editable) {
-            style["opacity"] = 1;
-        } else {
-            style["opacity"] = 0.5;
-        }
-        return <span
-            contentEditable={true}
-        id={this.props.id}
-        className={"Textarea"}
-        onInput={this.onChange}
-        onKeyDown={this.onKeyDown}
-        onKeyPress={this.onKeyPress}
-        onPaste={this.onPaste}
-        ref={"child"}
-        style={style}
-        >{this.props.text}</span>
+        var classes = React.addons.classSet({
+            "block": true,
+            "block-editable": this.props.editable,
+            "block-noneditable": !this.props.editable
+        });
+        return <div
+                className={classes}
+            >
+            <span
+                contentEditable={true}
+                id={this.props.id}
+                className={"blockContents"}
+                onInput={this.onChange}
+                onKeyDown={this.onKeyDown}
+                onKeyPress={this.onKeyPress}
+                onPaste={this.onPaste}
+                ref={"child"}
+                >
+                {this.props.text}
+            </span>
+        </div>
     },
     shouldComponentUpdate: function(nextProps){
-        return ((nextProps.text !== this.getDOMNode().textContent) ||
+        return ((nextProps.text !== this.refs.child.getDOMNode().textContent) ||
                 (nextProps.editable !== this.props.editable));
     },
     componentDidMount: function() {
-        this.lastText= this.getDOMNode().textContent; //lastText is a non-react-state, object-specific state variable
+        this.lastText= this.refs.child.getDOMNode().textContent; //lastText is a non-react-state, object-specific state variable
     },
 
     componentDidUpdate: function() {
-        if ( this.props.text !== this.getDOMNode().textContent) {
-            this.getDOMNode().textContent = this.props.text;
+        if ( this.props.text !== this.refs.child.getDOMNode().textContent) {
+            this.refs.child.getDOMNode().textContent = this.props.text;
         }
     },
 

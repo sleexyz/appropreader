@@ -13,7 +13,7 @@ var states = [
     },
     {
         voice: "me",
-        text: "Hi.\nWhat is this?\n"
+        text: "Hi.\n...What is this?\n"
     },
     {
         voice: "original",
@@ -257,11 +257,12 @@ var Doc = React.createClass({
                 updateFn: this.updateFn,
                 splitFn: this.splitFn,
                 deleteFn: this.deleteFn,
-                ref: "block" + blockIndex
+                ref: "block" + blockIndex,
+                key: block.key
             }
-            blocks.push(<div key={block.key}><Block
+            blocks.push(<Block
                     {...props}
-                    /></div>);
+                    />);
         }.bind(this));
         return (
                 <div id={"Doc"}>
