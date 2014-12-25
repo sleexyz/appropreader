@@ -40,10 +40,7 @@ var _genBlock = (function (){
         return output;
     }
     return function(object) {
-        if (object){
-            return objectAssign({}, object, {"key": nextKey()});
-        }
-        //else throw error!
+        return objectAssign({}, object, {"key": nextKey()});
     }
 })();
 
@@ -147,11 +144,31 @@ var Doc = React.createClass({
                     this._focusBeginning(blockIndex + 1);
                 }.bind(this));
             }.bind(this));
+        } else {
+            if ((right[0] === '\n') && (right.length > 1)) { //newline fix
+                left = left + "\n";
+                right = right.slice(1);
+            }
+            var leftBlock = objectAssign({}, this.state.blocks[blockIndex]);
+            leftBlock.text = left;
+            var rightBlock = _genBlock(leftBlock);
+            rightBlock.text = right;
+            var midBlock = this._newBlock();
+            var newState = React.addons.update(this.state, {
+                "blocks": {
+                    "$splice": [[blockIndex, 1, leftBlock, midBlock, rightBlock]]
+                }
+            });
+            this.setState(newState, function() {
+                this._focusBeginning(blockIndex + 1)
+            }.bind(this));
         }
     },
         /**
          * combines contiguous blocks of the same owner
          * @param blockIndex
+         * @param cb
+         * @param failcb
          */
     _reconcile: function(blockIndex, cb, failcb) {
         var left = this.state.blocks[blockIndex];
@@ -177,7 +194,7 @@ var Doc = React.createClass({
         var range = document.createRange();
         range.selectNodeContents(elem);
         range.collapse(true);
-        selection = window.getSelection();
+        var selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     },
@@ -192,7 +209,7 @@ var Doc = React.createClass({
         var range = document.createRange();
         range.selectNodeContents(elem);
         range.collapse(false);
-        selection = window.getSelection();
+        var selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
     },
