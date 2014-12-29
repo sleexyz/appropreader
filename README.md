@@ -1,4 +1,4 @@
-#`[appropreader](http://appropreader.sean.lee.mx)`
+#[`appropreader`](http://appropreader.sean.lee.mx)
 
 ### todo:
 - implement hiding voices
